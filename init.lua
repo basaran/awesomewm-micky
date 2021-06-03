@@ -1,40 +1,56 @@
--- [*] ------------------------------------------------------- dependencies -- ;
+--------------------------------------------------------------> dependencies ;
 
 local gears = require('gears')
 
--- [*] ------------------------------------------------------------ methods -- ;
+-------------------------------------------------------------------> methods ;
 
 local mouser = function ()
-    gears.timer.weak_start_new(0.1, function()
+    gears.timer.weak_start_new(0.05, function()
         local c = client.focus
         local cgeometry = c:geometry()
         mouse.coords({ x = cgeometry.x + cgeometry.width/2 , y = cgeometry.y + cgeometry.height/2 })
     end)
-end -- [+] relocate mouse after slightly waiting for focus to complete
+end
+--+ relocate mouse after slightly waiting for focus to
+--> complete. you can adjust the timer if you are on a slow
+--> cpu to give more time for the client to appear.
 
--- [*] ------------------------------------------------------------- signal -- ;
+---------------------------------------------------------------------> signal ;
 
 client.connect_signal("focus", function(c)
-    local current_client = mouse.current_client
+    local focused_client = c
+    --+ client the focus is going towards
 
-    if current_client and c ~= current_client then
-        mouser()
-    end -- [+] no need to relocate the mouse if already over the client
+    gears.timer.weak_start_new(0.05, function()
+        local current_client = mouse.current_client
+
+        if not current_client then
+            mouser() return false
+        end
+        --+ nothing under the mouse, move directly
+
+        if focused_client ~= current_client then
+            mouser() return false
+        end
+        --+ no need to relocate the mouse if already over
+        --> the client.
+    end)
+    --+ mouse.current_client would point to the previous
+    --> client without the callback.
 end)
 
 
 client.connect_signal("unmanage", function(c)
-    mouser() 
-    --[[
-        I think no client check behaviour is better when we
-        close things. We can change this later if need be or
-        possibly better add a table of classes for
-        exclusions.
-    --]]
+    local current_client = mouse.current_client
+
+    if current_client and c ~= current_client then
+        mouser()
+    end 
+    --+ no need to relocate the mouse if already over the
+    --> client.
 end)
 
-
--- [*] ------------------------------------------------------------- export -- ;
+---------------------------------------------------------------------> export ;
 
 return mouser
 
@@ -46,3 +62,5 @@ return mouser
 --   awful.client.run_or_raise(chromium, matcher('Google-chrome')) 
 --   mouser() 
 -- end),
+-- naughty.notify({text=current_client.name})
+-- naughty.notify({text=focused_client.name})
