@@ -22,6 +22,18 @@ client.connect_signal("focus", function(c)
     end -- [+] no need to relocate the mouse if already over the client
 end)
 
+
+client.connect_signal("unmanage", function(c)
+    mouser() 
+    --[[
+        I think no client check behaviour is better when we
+        close things. We can change this later if need be or
+        possibly better add a table of classes for
+        exclusions.
+    --]]
+end)
+
+
 -- [*] ------------------------------------------------------------- export -- ;
 
 return mouser
