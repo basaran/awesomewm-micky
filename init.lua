@@ -4,11 +4,15 @@ local gears = require('gears')
 
 -------------------------------------------------------------------> methods ;
 
-local mouser = function ()
+local micky = function ()
     gears.timer.weak_start_new(0.05, function()
         local c = client.focus
         local cgeometry = c:geometry()
-        mouse.coords({ x = cgeometry.x + cgeometry.width/2 , y = cgeometry.y + cgeometry.height/2 })
+        
+        mouse.coords({ 
+            x = cgeometry.x + cgeometry.width / 2,
+            y = cgeometry.y + cgeometry.height / 2 
+        })
     end)
 end
 --+ relocate mouse after slightly waiting for focus to
@@ -25,12 +29,12 @@ client.connect_signal("focus", function(c)
         local current_client = mouse.current_client
 
         if not current_client then
-            mouser() return false
+            micky() return false
         end
         --+ nothing under the mouse, move directly
 
         if focused_client ~= current_client then
-            mouser() return false
+            micky() return false
         end
         --+ no need to relocate the mouse if already over
         --> the client.
@@ -44,19 +48,18 @@ client.connect_signal("unmanage", function(c)
     local current_client = mouse.current_client
 
     if current_client and c ~= current_client then
-        mouser()
+        micky()
     end 
-    --+ no need to relocate the mouse if already over the
-    --> client.
+    --+ no need for the callback here.
 end)
 
 ---------------------------------------------------------------------> export ;
 
-return mouser
+return micky
 
--- [*] can also manually invoke the function through
--- shortcuts, but this is not necessary with this new
--- version.
+--+ can also manually invoke the function through
+--> shortcuts, but this is not necessary with this new
+--> version.
 
 -- awful.key({}, 'XF86HomePage', function () 
 --   awful.client.run_or_raise(chromium, matcher('Google-chrome')) 
