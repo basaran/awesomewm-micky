@@ -42,19 +42,23 @@ client.connect_signal("focus", function(c)
 
     gears.timer.weak_start_new(0.05, function()
         local client_under_mouse = mouse.current_client
+        local should_stay = set_contains(stay_classes, client_under_mouse.class)
 
-        if not set_contains(stay_classes, client_under_mouse.class) then
-            if not client_under_mouse then
-                micky() return false
-            end
-            --+ nothing under the mouse, move directly
+        if should_stay then return false end
+        --+ exclusions 
 
-            if focused_client ~= client_under_mouse then
-                micky() return false
-            end
-            --+ no need to relocate the mouse if already over
-            --> the client.
+        if not client_under_mouse then
+            micky() return false
         end
+        --+ nothing under the mouse, move directly
+
+        
+        if focused_client ~= client_under_mouse then
+            micky() return false
+        end
+        --+ no need to relocate the mouse if already over
+        --> the client.
+        
     end)
     --+ mouse.current_client would point to the previous
     --> client without the callback.
