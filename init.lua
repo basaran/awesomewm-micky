@@ -1,8 +1,22 @@
 --------------------------------------------------------------> dependencies ;
 
 local gears = require('gears')
+local inspect = require('inspect')
+
+
+-----------------------------------------------------------------> locals -- ;
+
+local stay_classes = { 
+    awesome
+}
+--+ class names defined here would insist micky stays where
+--> he is at.
 
 -------------------------------------------------------------------> methods ;
+
+local function set_contains(set, key)
+    return set[key] ~= nil
+end
 
 local micky = function ()
     gears.timer.weak_start_new(0.05, function()
@@ -22,22 +36,26 @@ end
 ---------------------------------------------------------------------> signal ;
 
 client.connect_signal("focus", function(c)
+    -- naughty.notify({text=inspect(mouse.coords())})
+
     local focused_client = c
     --+ client the focus is going towards
 
     gears.timer.weak_start_new(0.05, function()
-        local current_client = mouse.current_client
+        local client_under_mouse = mouse.current_client
 
-        if not current_client then
-            micky() return false
-        end
-        --+ nothing under the mouse, move directly
+        if not set_contains(stay_classes, client_under_mouse.class) then
+            if not client_under_mouse then
+                micky() return false
+            end
+            --+ nothing under the mouse, move directly
 
-        if focused_client ~= current_client then
-            micky() return false
+            if focused_client ~= client_under_mouse then
+                micky() return false
+            end
+            --+ no need to relocate the mouse if already over
+            --> the client.
         end
-        --+ no need to relocate the mouse if already over
-        --> the client.
     end)
     --+ mouse.current_client would point to the previous
     --> client without the callback.
@@ -45,9 +63,10 @@ end)
 
 
 client.connect_signal("unmanage", function(c)
-    local current_client = mouse.current_client
+    local client_under_mouse = mouse.current_client
+    -- naughty.notify({text=inspect(c:geometry())})
 
-    if current_client and c ~= current_client then
+    if client_under_mouse and c ~= client_under_mouse then
         micky()
     end 
     --+ no need for the callback here.
@@ -67,3 +86,10 @@ return micky
 -- end),
 -- naughty.notify({text=current_client.name})
 -- naughty.notify({text=focused_client.name})
+
+-- todo: disable mouse movement if unmanage was initiated by mouse click
+-- it seems the only way to do it externally would be to
+-- 1: get the geometry and location of the client in unmanage state
+-- 2: get mouse position
+-- 3: guess the Y area, like top 20 pixels or relative to the client
+-- 4: assume, it was a mouse click
