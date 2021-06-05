@@ -3,7 +3,6 @@
 local gears = require('gears')
 local inspect = require('inspect')
 
-
 -----------------------------------------------------------------> locals -- ;
 
 local stay_classes = { 
