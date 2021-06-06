@@ -7,6 +7,7 @@ local inspect = require('inspect')
 
 local stay_classes = { 
     awesome
+    -- taskbar
 }
 --+ class names defined here would insist micky stays where
 --> he is at.
@@ -35,8 +36,6 @@ end
 ---------------------------------------------------------------------> signal ;
 
 client.connect_signal("focus", function(c)
-    -- naughty.notify({text=inspect(mouse.coords())})
-
     local focused_client = c
     --+ client the focus is going towards
 
@@ -48,17 +47,17 @@ client.connect_signal("focus", function(c)
         --+ exclusions 
 
         if not client_under_mouse then
-            micky() return false
+            micky()
+            return false
         end
         --+ nothing under the mouse, move directly
 
-        
         if focused_client ~= client_under_mouse then
-            micky() return false
+            micky()
+            return false
         end
         --+ no need to relocate the mouse if already over
         --> the client.
-        
     end)
     --+ mouse.current_client would point to the previous
     --> client without the callback.
@@ -67,9 +66,12 @@ end)
 
 client.connect_signal("unmanage", function(c)
     local client_under_mouse = mouse.current_client
-    -- naughty.notify({text=inspect(c:geometry())})
 
-    if client_under_mouse and c ~= client_under_mouse then
+    if not client_under_mouse then 
+        return false
+    end
+
+    if client_under_mouse ~= c then
         micky()
     end 
     --+ no need for the callback here.
@@ -89,6 +91,8 @@ return micky
 -- end),
 -- naughty.notify({text=current_client.name})
 -- naughty.notify({text=focused_client.name})
+-- naughty.notify({text=inspect(c:geometry())})
+-- naughty.notify({text=inspect(mouse.current_widget_geometry)})
 
 -- todo: disable mouse movement if unmanage was initiated by mouse click
 -- it seems the only way to do it externally would be to
@@ -96,3 +100,8 @@ return micky
 -- 2: get mouse position
 -- 3: guess the Y area, like top 20 pixels or relative to the client
 -- 4: assume, it was a mouse click
+
+-- proximity detection sometimes, it's annoying this thing
+-- centers while we are super close to the next window we
+-- should add promixity detection, and if too close to the
+-- upcoming client, we should let the mouse stay.
