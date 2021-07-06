@@ -39,12 +39,15 @@ client.connect_signal("focus", function(c)
     local focused_client = c
     --+ client the focus is going towards
 
-    gears.timer.weak_start_new(0.05, function()
+    gears.timer.weak_start_new(0.15, function()
         local client_under_mouse = mouse.current_client
         local should_stay = set_contains(stay_classes, client_under_mouse.class)
 
         if should_stay then return false end
         --+ exclusions 
+
+        -- if compare_coords(focused_client) then return false end
+        --+ avoid tabs
 
         if not client_under_mouse then
             micky()
@@ -52,9 +55,11 @@ client.connect_signal("focus", function(c)
         end
         --+ nothing under the mouse, move directly
 
-        if focused_client ~= client_under_mouse then
-            micky()
-            return false
+        if focused_client:geometry().x ~= client_under_mouse:geometry().x
+           or focused_client:geometry().y ~= client_under_mouse:geometry().y
+           then
+           micky()
+           return false
         end
         --+ no need to relocate the mouse if already over
         --> the client.
