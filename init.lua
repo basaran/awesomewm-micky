@@ -109,3 +109,5 @@ return micky
 -- centers while we are super close to the next window we
 -- should add promixity detection, and if too close to the
 -- upcoming client, we should let the mouse stay.
+--
+-- -- module end
