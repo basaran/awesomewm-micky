@@ -5,7 +5,7 @@ local inspect = require('inspect')
 
 -----------------------------------------------------------------> locals -- ;
 
-local stay_classes = { 
+local stay_classes = {
     awesome
     -- taskbar
 }
@@ -18,14 +18,14 @@ local function set_contains(set, key)
     return set[key] ~= nil
 end
 
-local micky = function ()
+local micky = function()
     gears.timer.weak_start_new(0.05, function()
         local c = client.focus
         local cgeometry = c:geometry()
-        
-        mouse.coords({ 
+
+        mouse.coords({
             x = cgeometry.x + cgeometry.width / 2,
-            y = cgeometry.y + cgeometry.height / 2 
+            y = cgeometry.y + cgeometry.height / 2
         })
     end)
 end
@@ -44,10 +44,7 @@ client.connect_signal("focus", function(c)
         local should_stay = set_contains(stay_classes, client_under_mouse.class)
 
         if should_stay then return false end
-        --+ exclusions 
-
-        -- if compare_coords(focused_client) then return false end
-        --+ avoid tabs
+        --+ exclusions
 
         if not client_under_mouse then
             micky()
@@ -56,10 +53,10 @@ client.connect_signal("focus", function(c)
         --+ nothing under the mouse, move directly
 
         if focused_client:geometry().x ~= client_under_mouse:geometry().x
-           or focused_client:geometry().y ~= client_under_mouse:geometry().y
-           then
-           micky()
-           return false
+            or focused_client:geometry().y ~= client_under_mouse:geometry().y
+        then
+            micky()
+            return false
         end
         --+ no need to relocate the mouse if already over
         --> the client.
@@ -68,17 +65,19 @@ client.connect_signal("focus", function(c)
     --> client without the callback.
 end)
 
-
 client.connect_signal("unmanage", function(c)
     local client_under_mouse = mouse.current_client
 
-    if not client_under_mouse then 
+    local killed_client = c
+    --+ client the focus is going towards
+
+    if not client_under_mouse then
         return false
     end
 
     if client_under_mouse ~= c then
         micky()
-    end 
+    end
     --+ no need for the callback here.
 end)
 
@@ -90,9 +89,9 @@ return micky
 --> shortcuts, but this is not necessary with this new
 --> version.
 
--- awful.key({}, 'XF86HomePage', function () 
---   awful.client.run_or_raise(chromium, matcher('Google-chrome')) 
---   mouser() 
+-- awful.key({}, 'XF86HomePage', function ()
+--   awful.client.run_or_raise(chromium, matcher('Google-chrome'))
+--   mouser()
 -- end),
 -- naughty.notify({text=current_client.name})
 -- naughty.notify({text=focused_client.name})
